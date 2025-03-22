@@ -21,6 +21,7 @@
     ========================================================================
 */
 #include <stdio.h>
+#include <string.h>
 #define STACK_SIZE 50 // 최대 스택 크기
 
 int     call_stack[STACK_SIZE];         // Call Stack을 저장하는 배열
@@ -76,10 +77,28 @@ void print_stack()
 //func 내부는 자유롭게 추가해도 괜찮으나, 아래의 구조를 바꾸지는 마세요
 void func1(int arg1, int arg2, int arg3)
 {
+    SP += 3;
+    call_stack[0] = arg3;
+    strcpy(stack_info[0], "arg3");
+    call_stack[1] = arg2;
+    strcpy(stack_info[1], "arg2");
+    call_stack[2] = arg1;
+    strcpy(stack_info[2], "arg1");
+
     int var_1 = 100;
 
     // func1의 스택 프레임 형성 (함수 프롤로그 + push)
+    SP += 2;
+    call_stack[3] = -1;
+    strcpy(stack_info[3], "Return Address");
+    call_stack[4] = -1; // main stack frame 구현 안되어있음.
+    strcpy(stack_info[4], "func1 SFP");
+    FP += 5;
+    SP ++;
+    call_stack[5] = 100;
+    strcpy(stack_info[5] , "var_1");
     print_stack();
+
     func2(11, 13);
     // func2의 스택 프레임 제거 (함수 에필로그 + pop)
     print_stack();
@@ -88,22 +107,59 @@ void func1(int arg1, int arg2, int arg3)
 
 void func2(int arg1, int arg2)
 {
+    SP += 2;
+    call_stack[6] = 13;
+    strcpy(stack_info[6], "arg2");
+    call_stack[7] = 11;
+    strcpy(stack_info[7], "arg1");
+
     int var_2 = 200;
 
     // func2의 스택 프레임 형성 (함수 프롤로그 + push)
+    SP += 2;
+    call_stack[8] = -1;
+    strcpy(stack_info[8], "Return Address");
+    call_stack[9] = 4;
+    strcpy(stack_info[9], "func2 SFP");
+    FP = 9;
+    SP ++;
+    call_stack[10] = 200;
+    strcpy(stack_info[10], "var_2");
+
     print_stack();
+
     func3(77);
     // func3의 스택 프레임 제거 (함수 에필로그 + pop)
+    
+
+
     print_stack();
 }
 
 
 void func3(int arg1)
 {
+    SP ++;
+    call_stack[11] = 77;
+    strcpy(stack_info[11], "arg1");
+
     int var_3 = 300;
     int var_4 = 400;
 
     // func3의 스택 프레임 형성 (함수 프롤로그 + push)
+    SP +=2;
+    call_stack[12] = -1;
+    strcpy(stack_info[12], "Return Address");
+    call_stack[13] = 9;
+    strcpy(stack_info[13], "func3 SFP");
+    FP = 13;
+
+    SP += 2;
+    call_stack[14] = 300;
+    strcpy(stack_info[14], "var_3");
+    call_stack[15] = 400;
+    strcpy(stack_info[15], "var_4");
+
     print_stack();
 }
 
