@@ -41,7 +41,8 @@ int FP = -1;
 void func1(int arg1, int arg2, int arg3);
 void func2(int arg1, int arg2);
 void func3(int arg1);
-
+void push(int arg , char *explain);
+void pop();
 /*  
     현재 call_stack 전체를 출력합니다.
     해당 함수의 출력 결과들을 바탕으로 구현 완성도를 평가할 예정입니다.
@@ -77,33 +78,29 @@ void print_stack()
 //func 내부는 자유롭게 추가해도 괜찮으나, 아래의 구조를 바꾸지는 마세요
 void func1(int arg1, int arg2, int arg3)
 {
-    SP += 3;
-    call_stack[0] = arg3;
-    strcpy(stack_info[0], "arg3");
-    call_stack[1] = arg2;
-    strcpy(stack_info[1], "arg2");
-    call_stack[2] = arg1;
-    strcpy(stack_info[2], "arg1");
+
+    push(arg3, "arg3");
+    push(arg2, "arg2");
+    push(arg1 ,"arg1");
 
     int var_1 = 100;
 
     // func1의 스택 프레임 형성 (함수 프롤로그 + push)
-    SP += 2;
-    call_stack[3] = -1;
-    strcpy(stack_info[3], "Return Address");
-    call_stack[4] = -1; // main stack frame 구현 안되어있음.
-    strcpy(stack_info[4], "func1 SFP");
+    
+    push(-1,"Return Address");
+    push(-1, "func1 SFP");
     FP += 5;
-    SP ++;
-    call_stack[5] = 100;
-    strcpy(stack_info[5] , "var_1");
+    push(var_1 , "var_1");
     print_stack();
 
     func2(11, 13);
     // func2의 스택 프레임 제거 (함수 에필로그 + pop)
-    SP --; // 지역변수
+    SP --; 
     FP = 4;
-    SP -= 4;
+    pop();
+    pop();
+    pop();
+    pop();
 
     print_stack();
 }
@@ -111,73 +108,74 @@ void func1(int arg1, int arg2, int arg3)
 
 void func2(int arg1, int arg2)
 {
-    SP += 2;
-    call_stack[6] = 13;
-    strcpy(stack_info[6], "arg2");
-    call_stack[7] = 11;
-    strcpy(stack_info[7], "arg1");
+    push(arg2, "arg2");
+    push(arg1, "arg1");
 
     int var_2 = 200;
 
     // func2의 스택 프레임 형성 (함수 프롤로그 + push)
-    SP += 2;
-    call_stack[8] = -1;
-    strcpy(stack_info[8], "Return Address");
-    call_stack[9] = 4;
-    strcpy(stack_info[9], "func2 SFP");
+    push(-1 , "Return Address");
+    push(-1, "func2 SFP");
     FP = 9;
-    SP ++;
-    call_stack[10] = 200;
-    strcpy(stack_info[10], "var_2");
 
+    push(var_2 , "var_2");
     print_stack();
-
     func3(77);
     // func3의 스택 프레임 제거 (함수 에필로그 + pop)
-
     SP -= 2;
     FP = 9;
-    SP -= 3;
-
-
-
+    pop();
+    pop();
+    pop();
     print_stack();
 }
 
 
 void func3(int arg1)
 {
-    SP ++;
-    call_stack[11] = 77;
-    strcpy(stack_info[11], "arg1");
+    push(arg1 , "arg1");
 
     int var_3 = 300;
     int var_4 = 400;
 
     // func3의 스택 프레임 형성 (함수 프롤로그 + push)
-    SP +=2;
-    call_stack[12] = -1;
-    strcpy(stack_info[12], "Return Address");
-    call_stack[13] = 9;
-    strcpy(stack_info[13], "func3 SFP");
+    push(-1, "Return Address");
+    push(-1, "func3 SFP");
+
     FP = 13;
-
     SP += 2;
-    call_stack[14] = 300;
-    strcpy(stack_info[14], "var_3");
-    call_stack[15] = 400;
-    strcpy(stack_info[15], "var_4");
-
+    call_stack[SP-1] = var_3;
+    strcpy(stack_info[SP-1] , "var_3");
+    call_stack[SP] = var_4;
+    strcpy(stack_info[SP] , "var_4");
     print_stack();
 }
+
+void push(int arg , char *explain){
+    SP++;
+    call_stack[SP] = arg;
+    strcpy(stack_info[SP] , explain);
+}
+
+void pop(){
+    SP--;
+}
+
 
 
 //main 함수에 관련된 stack frame은 구현하지 않아도 됩니다.
 int main()
 {
     func1(1, 2, 3);
+
     // func1의 스택 프레임 제거 (함수 에필로그 + pop)
-    SP -= 6;
+    SP--;
+    pop();
+    pop();
+    pop();
+    pop();
+    pop();
+
 
     print_stack();
     return 0;
