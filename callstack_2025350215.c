@@ -89,14 +89,14 @@ void func1(int arg1, int arg2, int arg3)
     
     push(-1,"Return Address");
     push(-1, "func1 SFP");
-    FP += 5;
+    FP = SP;
     push(var_1 , "var_1");
     print_stack();
 
     func2(11, 13);
     // func2의 스택 프레임 제거 (함수 에필로그 + pop)
     SP --; 
-    FP = 4;
+    FP = call_stack[FP];
     pop();
     pop();
     pop();
@@ -115,15 +115,15 @@ void func2(int arg1, int arg2)
 
     // func2의 스택 프레임 형성 (함수 프롤로그 + push)
     push(-1 , "Return Address");
-    push(-1, "func2 SFP");
-    FP = 9;
+    push(FP, "func2 SFP");
+    FP = SP;
 
     push(var_2 , "var_2");
     print_stack();
     func3(77);
     // func3의 스택 프레임 제거 (함수 에필로그 + pop)
     SP -= 2;
-    FP = 9;
+    FP = call_stack[FP];
     pop();
     pop();
     pop();
@@ -140,29 +140,35 @@ void func3(int arg1)
 
     // func3의 스택 프레임 형성 (함수 프롤로그 + push)
     push(-1, "Return Address");
-    push(-1, "func3 SFP");
+    push(FP, "func3 SFP");
+    FP = SP;
 
-    FP = 13;
     SP += 2;
     call_stack[SP-1] = var_3;
     strcpy(stack_info[SP-1] , "var_3");
     call_stack[SP] = var_4;
     strcpy(stack_info[SP] , "var_4");
     print_stack();
+
 }
 
 void push(int arg , char *explain){
+    if(SP+1 >= STACK_SIZE){
+        printf("Stack overflow\n");
+        return;
+    }
     SP++;
     call_stack[SP] = arg;
     strcpy(stack_info[SP] , explain);
 }
 
 void pop(){
+    if(SP<0){
+        printf("Stack underflow\n");
+        return;
+    }
     SP--;
 }
-
-
-
 //main 함수에 관련된 stack frame은 구현하지 않아도 됩니다.
 int main()
 {
